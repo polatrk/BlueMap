@@ -20,7 +20,16 @@ set -eu
 DATA=/data
 CONF="$DATA/bluemap"
 mkdir -p "$CONF" "$DATA/ssh"
-[ -f /server-data/server.properties ] || echo "WARNING: /server-data/server.properties not found, mount the BDS folder on /server-data"
+# Wait for the BDS files instead of crash-looping (shared mount not ready / wrong path).
+while [ ! -f /server-data/server.properties ]; do
+  echo "------------------------------------------------------------------------------"
+  echo "Waiting for the BDS files: /server-data/server.properties not found."
+  echo "Mount the BDS folder (the one containing server.properties and worlds/) on /server-data."
+  echo "Current content of /server-data:"
+  ls -la /server-data 2>&1 | head -20
+  echo "Next check in 60s."
+  sleep 60
+done
 
 if [ -n "${BDS_SSH:-}" ]; then
   KEY="$DATA/ssh/id_key"
@@ -66,7 +75,7 @@ CONF_EOF
 # First start: let BlueMap write its default configs, then adapt them.
 if [ ! -f "$CONF/core.conf" ]; then
   echo "Generating the BlueMap configs..."
-  timeout 120 java -jar /app/bluemap-bedrock.jar -c bluemap </dev/null >/dev/null 2>&1 || true
+  timeout 300 java -jar /app/bluemap-bedrock.jar -c bluemap --init </dev/null 2>&1 | grep -v "missing important resources\|accept the required file download\|Please check:\|reload the plugin" || true
   if [ -f "$CONF/core.conf" ]; then
     sed -i "s/^render-thread-count: .*/render-thread-count: ${RENDER_THREADS:-2}/" "$CONF/core.conf"
     sed -i 's/^hires-slider-max: .*/hires-slider-max: 1500/; s/^hires-slider-default: .*/hires-slider-default: 350/; s/^lowres-slider-max: .*/lowres-slider-max: 10000/; s/^lowres-slider-default: .*/lowres-slider-default: 3000/' "$CONF/webapp.conf"

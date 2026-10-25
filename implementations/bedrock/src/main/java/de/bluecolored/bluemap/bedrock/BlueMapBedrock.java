@@ -185,6 +185,7 @@ public class BlueMapBedrock {
         options.addOption("c", "config", true, "BlueMap config folder (default: ./bluemap)");
         options.addOption("b", "bds", true, "Bedrock Dedicated Server folder, used when creating bedrock.conf (default: .)");
         options.addOption("e", "export-addon", true, "Write the BlueMap behavior packs (.mcpack) to this folder and exit");
+        options.addOption("i", "init", false, "Only create the configuration files, then exit");
         options.addOption("h", "help", false, "Show this help");
         CommandLine cmd;
         try {
@@ -213,6 +214,14 @@ public class BlueMapBedrock {
         Logger.global.logInfo("BlueMap " + BlueMap.VERSION + " for Bedrock Dedicated Server");
         try {
             BlueMapBedrock bm = new BlueMapBedrock(configFolder, BedrockConfig.load(configFolder, bds));
+            if (cmd.hasOption("i")) {
+                // Writes the default configs (core.conf, maps/...) without starting the console or the map.
+                bm.plugin.load();
+                bm.plugin.unload();
+                Logger.global.logInfo("Configuration files are in " + configFolder.toAbsolutePath().normalize());
+                System.exit(0);
+                return;
+            }
             Runtime.getRuntime().addShutdownHook(new Thread(bm::shutdown, "BlueMap-Shutdown"));
             bm.start();
             if (bm.readTerminal()) System.exit(0);
