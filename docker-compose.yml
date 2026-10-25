@@ -38,6 +38,8 @@ services:
       - /mnt/bds-data:/server-data:ro
       # BlueMap configs and map tiles.
       - ./data:/data
-      # Private ssh key used to reach BDS_SSH: a file named "ssh_key" next to this docker-compose.yml.
+      # Private ssh key used to reach BDS_SSH: a file named "ssh_key" next to this docker-compose.yml,
+      # without passphrase. Create it in this folder with:
+      #   ssh-keygen -t ed25519 -N "" -C bluemap -f ssh_key
       # (If the file is missing, Docker creates an empty folder instead and BlueMap generates a key.)
-      - ./ssh_key:/ssh/ssh_key:ro
+      - ./ssh_key:/ssh/ssh_key:ro   # ssh-keygen -t ed25519 -N "" -C bluemap -f ssh_key

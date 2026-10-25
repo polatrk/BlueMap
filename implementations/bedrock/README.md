@@ -38,7 +38,13 @@ cd implementations/bedrock/addon && npm install && npm run build
 
 ## Docker (BlueMap sur sa propre machine / LXC)
 
-Le [`docker-compose.yml`](../../docker-compose.yml) à la racine du dépôt suffit à lui seul (l'image est construite depuis GitHub). Mise en place complète, avec le pont ssh vers la console de BDS : [`docker/README.md`](docker/README.md).
+Le [`docker-compose.yml`](../../docker-compose.yml) à la racine du dépôt suffit à lui seul (l'image est construite depuis GitHub).
+Il attend à côté de lui la clé ssh privée vers le serveur BDS, nommée `ssh_key` :
+
+```bash
+ssh-keygen -t ed25519 -N "" -C bluemap -f ssh_key
+```
+ Mise en place complète, avec le pont ssh vers la console de BDS : [`docker/README.md`](docker/README.md).
 
 ## Installation automatique (BDS dans Docker)
 
