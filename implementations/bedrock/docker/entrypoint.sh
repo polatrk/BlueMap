@@ -7,7 +7,8 @@
 # Environment:
 #   BDS_SSH            user@host of the BDS machine (bluemap-bridge.sh as forced command), empty = no console
 #   SSH_PORT           ssh port (22)
-#   ACCEPT_DOWNLOAD    "true" to accept the download of Minecraft resources from Mojang (needed to render)
+#   ACCEPT_DOWNLOAD    download of the Minecraft resources from Mojang, needed to render ("true" by default,
+#                      i.e. the Minecraft EULA is accepted for it; "false" to refuse)
 #   RENDER_THREADS     render threads (2)
 #   RENDER_CAVES       "yes" to render underground (needed by the Layers (Y) view), default "no"
 #   SAVE_INTERVAL      seconds between forced BDS saves (30)
@@ -67,7 +68,7 @@ if [ ! -f "$CONF/core.conf" ]; then
   fi
 fi
 if [ -f "$CONF/core.conf" ]; then
-  if [ "${ACCEPT_DOWNLOAD:-false}" = "true" ]; then
+  if [ "${ACCEPT_DOWNLOAD:-true}" = "true" ]; then
     sed -i 's/^accept-download: .*/accept-download: true/' "$CONF/core.conf"
   else
     echo "ACCEPT_DOWNLOAD is not \"true\": BlueMap cannot download the Minecraft resources it needs to render."

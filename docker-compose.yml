@@ -23,9 +23,9 @@ services:
       # map updates only when BDS writes to disk by itself).
       BDS_SSH: "bluemap@192.168.1.220"
       SSH_PORT: "22"
-      # "true" = you accept the download of the Minecraft client resources from Mojang
-      # (https://www.minecraft.net/eula). BlueMap needs them to render.
-      ACCEPT_DOWNLOAD: "false"
+      # Download of the Minecraft client resources from Mojang, needed to render. "true" means you
+      # accept the Minecraft EULA (https://www.minecraft.net/eula) for it. Set "false" to refuse.
+      ACCEPT_DOWNLOAD: "true"
       RENDER_THREADS: "2"
       # "yes" renders underground blocks (needed to look below y 55 with the Layers (Y) menu),
       # several times more disk space. Only read on the very first start.

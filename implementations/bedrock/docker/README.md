@@ -62,9 +62,11 @@ docker compose logs bluemap         # affiche la ligne à autoriser
 ```
 1. Copier la ligne `command="/usr/local/bin/bluemap-bridge.sh",...` affichée dans
    `/home/bluemap/.ssh/authorized_keys` du LXC BDS (fichier en 600, dossier `.ssh` en 700).
-2. Mettre `ACCEPT_DOWNLOAD: "true"` dans `docker-compose.yml` (c'est accepter le téléchargement des
-   ressources du client Minecraft depuis Mojang).
-3. `docker compose up -d`. La carte est sur le port 8100.
+2. `docker compose restart`. La carte est sur le port 8100.
+
+Les ressources du client Minecraft (textures, modèles) sont téléchargées automatiquement depuis Mojang au
+premier démarrage (`ACCEPT_DOWNLOAD: "true"`, ce qui revient à accepter l'EULA de Minecraft pour ce
+téléchargement ; mettre `"false"` pour refuser).
 
 Pour vérifier le pont depuis le LXC BlueMap (doit afficher la console de BDS) :
 ```bash
