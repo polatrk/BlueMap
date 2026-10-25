@@ -1,4 +1,4 @@
-# BlueMap for Bedrock Dedicated Server, on its own machine / LXC (see README.md).
+# BlueMap for Bedrock Dedicated Server, on its own machine / LXC (setup: implementations/bedrock/docker/README.md).
 #
 # Only this file is needed: put it in an empty folder, then
 #   docker compose up -d --build
