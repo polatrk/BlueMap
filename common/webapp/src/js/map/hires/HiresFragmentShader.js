@@ -41,6 +41,8 @@ uniform float animationFrameIndex;
 uniform float animationInterpolationFrameIndex;
 uniform float animationInterpolation;
 uniform bool chunkBorders;
+uniform float sliceMinY;
+uniform float sliceMaxY;
 
 varying vec3 vPosition;
 varying vec3 vWorldPosition;
@@ -53,6 +55,9 @@ varying float vBlocklight;
 //varying float vDistance;
 
 void main() {
+
+	// layer slice (blocks between sliceMinY and sliceMaxY, a block spans y..y+1)
+	if (vWorldPosition.y < sliceMinY - 0.01 || vWorldPosition.y > sliceMaxY + 1.01) discard;
 
 	vec4 color = texture(textureImage, vec2(vUv.x, animationFrameHeight * (vUv.y + animationFrameIndex)));
 	if (animationInterpolation > 0.0) {

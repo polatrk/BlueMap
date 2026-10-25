@@ -108,6 +108,11 @@ export class BlueMapApp {
             screenshot: {
                 clipboard: true
             },
+            layers: {
+                enabled: false,
+                minY: -64,
+                maxY: 320
+            },
             debug: false
         });
 
@@ -624,6 +629,19 @@ export class BlueMapApp {
         this.mapViewer.data.uniforms.chunkBorders.value = chunkBorders;
     }
 
+    /**
+     * Shows only the blocks between minY and maxY (inclusive) when enabled.
+     */
+    setLayerSlice(enabled, minY, maxY) {
+        const layers = this.appState.layers;
+        layers.enabled = !!enabled;
+        layers.minY = Math.round(Math.min(minY, maxY));
+        layers.maxY = Math.round(Math.max(minY, maxY));
+        this.mapViewer.data.uniforms.sliceMinY.value = layers.enabled ? layers.minY : -100000;
+        this.mapViewer.data.uniforms.sliceMaxY.value = layers.enabled ? layers.maxY : 100000;
+        this.mapViewer.redraw();
+    }
+
     setDebug(debug) {
         this.appState.debug = debug;
 
@@ -713,6 +731,11 @@ export class BlueMapApp {
         this.setScreenshotClipboard(this.loadUserSetting("screenshotClipboard", this.appState.screenshot.clipboard));
         await setLanguage(this.loadUserSetting("lang", i18n.locale.value));
         this.setChunkBorders(this.loadUserSetting("chunkBorders", this.mapViewer.data.uniforms.chunkBorders.value))
+        this.setLayerSlice(
+            this.loadUserSetting("layersEnabled", this.appState.layers.enabled),
+            this.loadUserSetting("layersMinY", this.appState.layers.minY),
+            this.loadUserSetting("layersMaxY", this.appState.layers.maxY)
+        );
         this.setDebug(this.loadUserSetting("debug", this.appState.debug));
 
         alert(this.events, "Settings loaded!", "info");
@@ -734,6 +757,9 @@ export class BlueMapApp {
         this.saveUserSetting("screenshotClipboard", this.appState.screenshot.clipboard);
         this.saveUserSetting("lang", i18n.locale.value);
         this.saveUserSetting("chunkBorders", this.mapViewer.data.uniforms.chunkBorders.value);
+        this.saveUserSetting("layersEnabled", this.appState.layers.enabled);
+        this.saveUserSetting("layersMinY", this.appState.layers.minY);
+        this.saveUserSetting("layersMaxY", this.appState.layers.maxY);
         this.saveUserSetting("debug", this.appState.debug);
 
         alert(this.events, "Settings saved!", "info");

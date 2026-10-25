@@ -27,6 +27,8 @@ package de.bluecolored.bluemap.core.world;
 import de.bluecolored.bluemap.core.util.Key;
 import de.bluecolored.bluemap.core.util.Keyed;
 import de.bluecolored.bluemap.core.util.Registry;
+import de.bluecolored.bluemap.core.world.bedrock.BedrockLevel;
+import de.bluecolored.bluemap.core.world.bedrock.BedrockWorld;
 import de.bluecolored.bluemap.core.world.mca.MCAWorld;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +36,18 @@ import lombok.experimental.Delegate;
 
 public interface WorldLoaderType extends Keyed, WorldLoader {
 
-    WorldLoaderType ANVIL = new Impl(Key.bluemap("anvil"), MCAWorld::load);
+    /** Java worlds; Bedrock worlds (db/ LevelDB folder) are detected and handed to {@link #BEDROCK}. */
+    WorldLoaderType ANVIL = new Impl(Key.bluemap("anvil"), (path, dimension, dimensionType, dataPack) ->
+            BedrockLevel.isBedrockWorld(path) ?
+                    BedrockWorld.load(path, dimension, dimensionType, dataPack) :
+                    MCAWorld.load(path, dimension, dimensionType, dataPack)
+    );
+    /** Bedrock Dedicated Server worlds (LevelDB), read in place without writing to the world folder. */
+    WorldLoaderType BEDROCK = new Impl(Key.bluemap("bedrock"), BedrockWorld::load);
 
     Registry<WorldLoaderType> REGISTRY = new Registry<>(
-            ANVIL
+            ANVIL,
+            BEDROCK
     );
 
     @RequiredArgsConstructor

@@ -32,6 +32,7 @@ import de.bluecolored.bluemap.core.logger.Logger;
 import de.bluecolored.bluemap.core.resources.pack.datapack.DataPack;
 import de.bluecolored.bluemap.core.util.FileHelper;
 import de.bluecolored.bluemap.core.util.Key;
+import de.bluecolored.bluemap.core.world.bedrock.BedrockLevel;
 import de.bluecolored.bluemap.core.world.BlockState;
 import lombok.Builder;
 import lombok.Getter;
@@ -403,7 +404,8 @@ public class BlueMapConfigManager implements BlueMapConfiguration {
                 .setVariable("void-color", "#000000")
                 .setVariable("ambient-light", "0.1")
                 .setVariable("remove-caves-below-y", "55")
-                .setConditional("remove-nether-ceiling", false);
+                .setConditional("remove-nether-ceiling", false)
+                .setVariable("ignore-missing-light-data", String.valueOf(BedrockLevel.isBedrockWorld(worldFolder)));
     }
 
     private ConfigTemplate createNetherMapTemplate(String name, Path worldFolder, Key dimension, Key dimensionType, int sorting) throws IOException {
@@ -418,7 +420,8 @@ public class BlueMapConfigManager implements BlueMapConfiguration {
                 .setVariable("void-color", "#150000")
                 .setVariable("ambient-light", "0.6")
                 .setVariable("remove-caves-below-y", "-10000")
-                .setConditional("remove-nether-ceiling", true);
+                .setConditional("remove-nether-ceiling", true)
+                .setVariable("ignore-missing-light-data", String.valueOf(BedrockLevel.isBedrockWorld(worldFolder)));
     }
 
     private ConfigTemplate createEndMapTemplate(String name, Path worldFolder, Key dimension, Key dimensionType, int sorting) throws IOException {
@@ -433,7 +436,8 @@ public class BlueMapConfigManager implements BlueMapConfiguration {
                 .setVariable("void-color", "#080010")
                 .setVariable("ambient-light", "0.6")
                 .setVariable("remove-caves-below-y", "-10000")
-                .setConditional("remove-nether-ceiling", false);
+                .setConditional("remove-nether-ceiling", false)
+                .setVariable("ignore-missing-light-data", String.valueOf(BedrockLevel.isBedrockWorld(worldFolder)));
     }
 
     public static String formatPath(Path path) {

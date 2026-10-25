@@ -53,6 +53,8 @@ uniform float lod;
 uniform float lodScale;
 uniform vec3 voidColor;
 uniform bool chunkBorders;
+uniform float sliceMinY;
+uniform float sliceMaxY;
 
 varying vec3 vPosition;
 varying vec3 vWorldPosition;
@@ -84,6 +86,10 @@ vec3 adjustColor(vec3 color) {
 }
 
 void main() {
+
+	// layer slice (blocks between sliceMinY and sliceMaxY, a block spans y..y+1)
+	if (vWorldPosition.y < sliceMinY - 0.01 || vWorldPosition.y > sliceMaxY + 1.01) discard;
+
 	//discard if hires tile is loaded at that position
 	if (distance < 1000.0 && texture(hiresTileMap.map, ((vWorldPosition.xz - hiresTileMap.translate) / hiresTileMap.scale - hiresTileMap.pos) / hiresTileMap.size + 0.5).r > 0.75) discard;
 	

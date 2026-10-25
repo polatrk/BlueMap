@@ -63,6 +63,9 @@ export class MapViewer {
 				skyColor: { value: new Color(0.5, 0.5, 1) },
 				voidColor: { value: new Color(0, 0, 0) },
 				chunkBorders: { value: false },
+				// Layer slice: only blocks with sliceMinY <= y <= sliceMaxY are drawn.
+				sliceMinY: { value: -100000 },
+				sliceMaxY: { value: 100000 },
 				hiresTileMap: {
 					value: {
 						map: null,
