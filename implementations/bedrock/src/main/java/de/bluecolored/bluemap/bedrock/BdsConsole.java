@@ -178,8 +178,20 @@ public final class BdsConsole {
                 if (w == null || !running) return;
                 synchronized (w) { w.write(cmd); w.newLine(); w.flush(); }
             } else if (config.consoleMode().equals("external")) {
-                new ProcessBuilder(shell(config.commandTemplate().replace("{cmd}", cmd)))
-                        .redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start();
+                String template = config.commandTemplate();
+                if (template.contains("{cmd}")) {
+                    new ProcessBuilder(shell(template.replace("{cmd}", cmd)))
+                            .redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start();
+                } else {
+                    // No placeholder: the command is written to the process' stdin (one line). This avoids
+                    // any shell quoting issue, e.g. through ssh to a bridge script on the BDS host.
+                    Process p = new ProcessBuilder(shell(template))
+                            .redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start();
+                    try (Writer w = new OutputStreamWriter(p.getOutputStream(), StandardCharsets.UTF_8)) {
+                        w.write(cmd);
+                        w.write('\n');
+                    }
+                }
             }
         } catch (IOException ex) {
             Logger.global.logWarning("Failed to send '" + cmd + "' to BDS: " + ex);

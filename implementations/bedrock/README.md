@@ -36,6 +36,10 @@ BlueMap complet (webserver, joueurs en direct, mises à jour en direct, marqueur
 cd implementations/bedrock/addon && npm install && npm run build
 ```
 
+## Docker (BlueMap sur sa propre machine / LXC)
+
+Voir [`docker/README.md`](docker/README.md) : image, `docker-compose.yml` et pont ssh vers la console de BDS.
+
 ## Installation automatique (BDS dans Docker)
 
 Sur la machine qui fait tourner le conteneur BDS (BDS lancé dans `screen -S mc-server`) :

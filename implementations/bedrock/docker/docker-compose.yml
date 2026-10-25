@@ -1,0 +1,38 @@
+# BlueMap for Bedrock Dedicated Server, on its own machine / LXC (see README.md).
+#
+#   docker compose up -d --build
+#   docker compose logs -f bluemap
+services:
+  bluemap:
+    build:
+      context: .
+      args:
+        REPO: https://github.com/polatrk/BlueMap.git
+        REF: bedrock
+    image: bluemap-bedrock:local
+    container_name: bluemap
+    restart: unless-stopped
+    init: true
+    ports:
+      - "8100:8100"   # web map
+      # - "8101:8101" # only for the "net" add-on variant (ADDON_PORT)
+    environment:
+      # BDS machine reached over ssh (bluemap-bridge.sh). Empty: no console (no live players,
+      # map updates only when BDS writes to disk by itself).
+      BDS_SSH: "bluemap@192.168.1.220"
+      SSH_PORT: "22"
+      # "true" = you accept the download of the Minecraft client resources from Mojang
+      # (https://www.minecraft.net/eula). BlueMap needs them to render.
+      ACCEPT_DOWNLOAD: "false"
+      RENDER_THREADS: "2"
+      # "yes" renders underground blocks (needed to look below y 55 with the Layers (Y) menu),
+      # several times more disk space. Only read on the very first start.
+      RENDER_CAVES: "no"
+      SAVE_INTERVAL: "30"
+      JAVA_OPTS: "-Xmx2G"
+    volumes:
+      # BDS folder (the one with server.properties and worlds/), shared from the Proxmox host.
+      # Read-only: BlueMap never writes to the server.
+      - /mnt/bds-data:/server-data:ro
+      # BlueMap configs, map tiles and ssh key.
+      - ./data:/data
