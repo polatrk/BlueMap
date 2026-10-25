@@ -2,7 +2,7 @@
 
 Deux LXC Proxmox :
 - **LXC BDS** : le serveur Bedrock dans Docker (conteneur `mc-bedrock-server`, BDS dans `screen -S mc-server`) ;
-- **LXC BlueMap** : ce `docker-compose.yml`.
+- **LXC BlueMap** : le `docker-compose.yml` à la racine du dépôt (il suffit à lui seul : l'image est construite depuis GitHub).
 
 BlueMap a besoin de deux choses côté BDS :
 1. **les fichiers du serveur, en lecture seule** : un dossier de l'hôte Proxmox monté dans les deux LXC ;
@@ -54,6 +54,9 @@ Le serveur ssh doit tourner dans le LXC BDS (`apt install openssh-server`).
 ## 4. Lancer BlueMap (LXC BlueMap)
 
 ```bash
+mkdir bluemap && cd bluemap
+curl -fsSLO https://raw.githubusercontent.com/polatrk/BlueMap/bedrock/docker-compose.yml
+# adapter BDS_SSH (utilisateur@IP du LXC BDS) et le chemin du montage si besoin
 docker compose up -d --build        # premier build : plusieurs minutes (BlueMap est compilé)
 docker compose logs bluemap         # affiche la ligne à autoriser
 ```

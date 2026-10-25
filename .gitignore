@@ -23,3 +23,6 @@ core/src/main/resources/de/bluecolored/bluemap/resourceExtensions.zip
 
 #exclude-test-data
 data/test-render
+
+# BlueMap for Bedrock (docker-compose.yml at the root)
+/data/
