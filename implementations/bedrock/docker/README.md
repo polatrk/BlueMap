@@ -57,12 +57,21 @@ Le serveur ssh doit tourner dans le LXC BDS (`apt install openssh-server`).
 mkdir bluemap && cd bluemap
 curl -fsSLO https://raw.githubusercontent.com/polatrk/BlueMap/bedrock/docker-compose.yml
 # adapter BDS_SSH (utilisateur@IP du LXC BDS) et le chemin du montage si besoin
+
+# clé ssh privée, sans phrase de passe, à côté du docker-compose.yml, nommée ssh_key :
+ssh-keygen -t ed25519 -N "" -C bluemap -f ssh_key      # ou copier une clé existante en ./ssh_key
+# (ssh_key.pub n'est pas utilisée par le conteneur)
+
 docker compose up -d --build        # premier build : plusieurs minutes (BlueMap est compilé)
 docker compose logs bluemap         # affiche la ligne à autoriser
 ```
 1. Copier la ligne `command="/usr/local/bin/bluemap-bridge.sh",...` affichée dans
    `/home/bluemap/.ssh/authorized_keys` du LXC BDS (fichier en 600, dossier `.ssh` en 700).
+   Gardez bien le préfixe `command="..."` : c'est lui qui limite la clé au pont.
 2. `docker compose restart`. La carte est sur le port 8100.
+
+Sans fichier `ssh_key`, Docker crée à sa place un dossier vide et BlueMap génère sa propre clé
+(dans `data/ssh/`) : la ligne affichée par `docker compose logs` reste celle à autoriser.
 
 Les ressources du client Minecraft (textures, modèles) sont téléchargées automatiquement depuis Mojang au
 premier démarrage (`ACCEPT_DOWNLOAD: "true"`, ce qui revient à accepter l'EULA de Minecraft pour ce

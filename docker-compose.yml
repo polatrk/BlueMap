@@ -36,5 +36,8 @@ services:
       # BDS folder (the one with server.properties and worlds/), shared from the Proxmox host.
       # Read-only: BlueMap never writes to the server.
       - /mnt/bds-data:/server-data:ro
-      # BlueMap configs, map tiles and ssh key.
+      # BlueMap configs and map tiles.
       - ./data:/data
+      # Private ssh key used to reach BDS_SSH: a file named "ssh_key" next to this docker-compose.yml.
+      # (If the file is missing, Docker creates an empty folder instead and BlueMap generates a key.)
+      - ./ssh_key:/ssh/ssh_key:ro

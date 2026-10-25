@@ -6,6 +6,7 @@
 #
 # Environment:
 #   BDS_SSH            user@host of the BDS machine (bluemap-bridge.sh as forced command), empty = no console
+#                      The private key is /ssh/ssh_key (./ssh_key next to docker-compose.yml), else one is generated.
 #   SSH_PORT           ssh port (22)
 #   ACCEPT_DOWNLOAD    download of the Minecraft resources from Mojang, needed to render ("true" by default,
 #                      i.e. the Minecraft EULA is accepted for it; "false" to refuse)
@@ -22,15 +23,22 @@ mkdir -p "$CONF" "$DATA/ssh"
 [ -f /server-data/server.properties ] || echo "WARNING: /server-data/server.properties not found, mount the BDS folder on /server-data"
 
 if [ -n "${BDS_SSH:-}" ]; then
-  KEY="$DATA/ssh/id_ed25519"
-  if [ ! -f "$KEY" ]; then
+  KEY="$DATA/ssh/id_key"
+  if [ -f /ssh/ssh_key ]; then
+    # Key provided next to docker-compose.yml: copy it, ssh refuses keys readable by others.
+    cp /ssh/ssh_key "$KEY"
+    chmod 600 "$KEY"
+    echo "Using the ssh key provided in ./ssh_key"
+  elif [ ! -f "$KEY" ]; then
     ssh-keygen -q -t ed25519 -N "" -C "bluemap" -f "$KEY"
+    echo "No ./ssh_key provided: generated a key in data/ssh/"
   fi
+  PUB=$(ssh-keygen -y -f "$KEY" 2>/dev/null | cut -d" " -f1-2) && [ -n "$PUB" ] || { echo "ERROR: cannot read the ssh key (passphrase-protected keys are not supported)"; exit 1; }
   echo "------------------------------------------------------------------------------"
-  echo "BlueMap ssh public key. On the BDS machine, add this line to"
-  echo "~/.ssh/authorized_keys of the user in BDS_SSH (see README.md):"
+  echo "On the BDS machine, add this line to ~/.ssh/authorized_keys of the user in BDS_SSH"
+  echo "(the key can then only read the console or send one console line, see README.md):"
   echo
-  echo "command=\"/usr/local/bin/bluemap-bridge.sh\",no-pty,no-port-forwarding,no-agent-forwarding,no-X11-forwarding $(cat "$KEY.pub")"
+  echo "command=\"/usr/local/bin/bluemap-bridge.sh\",no-pty,no-port-forwarding,no-agent-forwarding,no-X11-forwarding $PUB bluemap"
   echo "------------------------------------------------------------------------------"
   SSH="ssh -i $KEY -p ${SSH_PORT:-22} -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=$DATA/ssh/known_hosts -o ServerAliveInterval=30 -o ServerAliveCountMax=3 $BDS_SSH"
   MODE=external

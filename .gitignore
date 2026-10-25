@@ -26,3 +26,5 @@ data/test-render
 
 # BlueMap for Bedrock (docker-compose.yml at the root)
 /data/
+/ssh_key
+/ssh_key.pub
