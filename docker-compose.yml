@@ -1,17 +1,16 @@
 # BlueMap for Bedrock Dedicated Server, on its own machine / LXC (setup: implementations/bedrock/docker/README.md).
 #
 # Only this file is needed: put it in an empty folder, then
-#   docker compose up -d --build
+#   docker compose up -d
 #   docker compose logs -f bluemap
+# Update: docker compose pull && docker compose up -d
 services:
   bluemap:
-    # Built straight from GitHub: this file is all you need (no clone).
-    build:
-      context: https://github.com/polatrk/BlueMap.git#bedrock:implementations/bedrock/docker
-      args:
-        REPO: https://github.com/polatrk/BlueMap.git
-        REF: bedrock
-    image: bluemap-bedrock:local
+    # Prebuilt image, published by .github/workflows/bedrock-docker.yml on every push to "bedrock".
+    image: ghcr.io/polatrk/bluemap-bedrock:latest
+    # To compile it yourself instead (about 10 minutes), remove the "image" line above and use:
+    # build:
+    #   context: https://github.com/polatrk/BlueMap.git#bedrock:implementations/bedrock/docker
     container_name: bluemap
     restart: unless-stopped
     init: true

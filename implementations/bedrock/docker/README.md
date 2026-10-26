@@ -2,7 +2,7 @@
 
 Deux LXC Proxmox :
 - **LXC BDS** : le serveur Bedrock dans Docker (conteneur `mc-bedrock-server`, BDS dans `screen -S mc-server`) ;
-- **LXC BlueMap** : le `docker-compose.yml` à la racine du dépôt (il suffit à lui seul : l'image est construite depuis GitHub).
+- **LXC BlueMap** : le `docker-compose.yml` à la racine du dépôt (il suffit à lui seul : il utilise l'image publiée `ghcr.io/polatrk/bluemap-bedrock`).
 
 BlueMap a besoin de deux choses côté BDS :
 1. **les fichiers du serveur, en lecture seule** : un dossier de l'hôte Proxmox monté dans les deux LXC ;
@@ -62,7 +62,7 @@ curl -fsSLO https://raw.githubusercontent.com/polatrk/BlueMap/bedrock/docker-com
 ssh-keygen -t ed25519 -N "" -C bluemap -f ssh_key      # ou copier une clé existante en ./ssh_key
 # (ssh_key.pub n'est pas utilisée par le conteneur)
 
-docker compose up -d --build        # premier build : plusieurs minutes (BlueMap est compilé)
+docker compose up -d               # télécharge l'image ghcr.io/polatrk/bluemap-bedrock
 docker compose logs bluemap         # affiche la ligne à autoriser
 ```
 1. Copier la ligne `command="/usr/local/bin/bluemap-bridge.sh",...` affichée dans
@@ -79,10 +79,14 @@ téléchargement ; mettre `"false"` pour refuser).
 
 Pour vérifier le pont depuis le LXC BlueMap (doit afficher la console de BDS) :
 ```bash
-docker exec bluemap ssh -i /data/ssh/id_ed25519 -o UserKnownHostsFile=/data/ssh/known_hosts bluemap@<IP BDS> logs
+docker exec -it bluemap ssh -i /data/ssh/id_key -o UserKnownHostsFile=/data/ssh/known_hosts <BDS_SSH> logs
 ```
 
 ## Mettre à jour
 
-`docker compose build --no-cache && docker compose up -d` recompile depuis la dernière version de la
-branche `bedrock`.
+```bash
+docker compose pull && docker compose up -d
+```
+L'image est reconstruite et publiée par GitHub Actions (`.github/workflows/bedrock-docker.yml`) à chaque push
+sur la branche `bedrock`. Pour compiler vous-même (environ 10 minutes), voir les lignes `build:` commentées
+dans `docker-compose.yml`.
