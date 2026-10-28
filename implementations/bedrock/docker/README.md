@@ -51,6 +51,17 @@ sudo useradd -m -G docker -s /bin/sh bluemap      # utilisateur autorisé à uti
 ```
 Le serveur ssh doit tourner dans le LXC BDS (`apt install openssh-server`).
 
+### Console de BDS lisible
+
+L'add-on écrit une ligne `[BEDMAP]` par seconde quand des joueurs sont connectés, et BlueMap lance
+`save hold` / `save query` / `save resume` à chaque `SAVE_INTERVAL`. Le pont lit la console dans le fichier
+`/var/log/server.log` du conteneur (`BDS_LOG`). Le `docker logs` de BDS peut donc masquer ces lignes
+sans gêner BlueMap. Dans le `Dockerfile` de BDS, remplacer la dernière commande par :
+```dockerfile
+CMD ["bash", "-c", "cron && screen -dmS mc-server bash -c './bedrock_server | tee /var/log/server.log' && tail -f /var/log/server.log | grep --line-buffered -avF -e '[BEDMAP]' -e 'Saving...' -e 'A previous save has not been completed' -e 'Data saved. Files are now ready to be copied' -e '.ldb:' -e 'Changes to the world are resumed' -e 'The command is already running'"]
+```
+puis `docker compose up -d --build`. La session `screen` affiche toujours tout.
+
 ## 4. Lancer BlueMap (LXC BlueMap)
 
 ```bash
